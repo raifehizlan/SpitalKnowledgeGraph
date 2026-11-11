@@ -1,0 +1,657 @@
+# Swiss Hospital Intelligence ontology, version 0.1
+# Proposal. Namespace is provisional (example.org, RFC 2606) until a permanent domain is chosen.
+# Source-language labels on concepts are copied from the BAG 2024 key-figure workbook or the
+# German indicator description. Labels are not translated beyond those sources.
+
+@prefix shi: <https://example.org/shi/ontology/> .
+@prefix shic: <https://example.org/shi/concept/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+<https://example.org/shi/ontology>
+    a owl:Ontology ;
+    owl:versionInfo "0.1" ;
+    dcterms:title "Swiss Hospital Intelligence ontology"@en ;
+    dcterms:description "Draft vocabulary for establishments, sites, statistics, quality indicators, and evidence. The relational database remains the system of record. This graph is a projection."@en ;
+    rdfs:comment "Multilingual labels exist only where an opened BAG source states them. Romansh labels are not invented."@en .
+
+# ---------------------------------------------------------------------------
+# Classes
+# ---------------------------------------------------------------------------
+
+shi:HospitalOrganization a owl:Class ;
+    rdfs:label "Hospital organization"@en, "Spitalbetrieb"@de ;
+    rdfs:comment "A hospital establishment in the BAG sense. Statistics in the 2024 key-figure sheet belong here, not on each site."@en ;
+    owl:disjointWith shi:HospitalSite, shi:StatisticObservation, shi:MedicalDevice .
+
+shi:HospitalSite a owl:Class ;
+    rdfs:label "Hospital site"@en, "Standort"@de ;
+    rdfs:comment "A geographic place where an organization operates. Site canton may differ from the organization's home canton."@en ;
+    owl:disjointWith shi:HospitalOrganization .
+
+shi:Canton a owl:Class ;
+    rdfs:label "Canton"@en, "Kanton"@de ;
+    rdfs:comment "Identified by the two-letter code used in the BAG sheet. Official canton names are not in that sheet and are not invented here."@en .
+
+shi:Department a owl:Class ;
+    rdfs:label "Department"@en ;
+    rdfs:comment "Created only when a source explicitly names a department. Not derived from an equipment token or a quality-indicator chapter."@en .
+
+shi:Clinic a owl:Class ;
+    rdfs:label "Clinic"@en .
+
+shi:Specialty a owl:Class ;
+    rdfs:label "Specialty"@en ;
+    rdfs:comment "A clinical specialty concept. A CH-IQI chapter such as myocardial infarction is a quality topic, not automatically a specialty offered by a hospital."@en .
+
+shi:HealthcareProfessional a owl:Class ;
+    rdfs:label "Healthcare professional"@en ;
+    rdfs:comment "Public affiliation only, with a date and a source. A publication byline is not current employment."@en .
+
+shi:MedicalService a owl:Class ;
+    rdfs:label "Medical service"@en .
+
+shi:Treatment a owl:Class ;
+    rdfs:label "Treatment"@en .
+
+shi:MedicalCondition a owl:Class ;
+    rdfs:label "Medical condition"@en .
+
+shi:MedicalDevice a owl:Class ;
+    rdfs:label "Medical device"@en ;
+    rdfs:comment "A described device with its own evidence. An SA token such as MRI is an EquipmentPresence, not a MedicalDevice."@en ;
+    owl:disjointWith shi:EquipmentPresence .
+
+shi:EquipmentPresence a owl:Class ;
+    rdfs:label "Equipment presence"@en, "Spezialausrüstung"@de ;
+    rdfs:comment "The 2024 SA field says a class of equipment was reported for the establishment. It does not give a count, model, installation date, or current status."@en ;
+    rdfs:subClassOf shi:CodedPresence .
+
+shi:CodedPresence a owl:Class ;
+    rdfs:label "Coded presence"@en ;
+    rdfs:comment "A source token on an establishment for one reference year: specific service, training, equipment, or service offer."@en .
+
+shi:ResearchOrganization a owl:Class ;
+    rdfs:label "Research organization"@en .
+
+shi:ResearchProject a owl:Class ;
+    rdfs:label "Research project"@en .
+
+shi:Publication a owl:Class ;
+    rdfs:label "Publication"@en .
+
+shi:Certification a owl:Class ;
+    rdfs:label "Certification"@en .
+
+shi:Cooperation a owl:Class ;
+    rdfs:label "Cooperation"@en ;
+    rdfs:comment "A named relationship. Both parties and the evidence are required. Co-occurrence in a canton is not a cooperation."@en .
+
+shi:MeasureDefinition a owl:Class ;
+    rdfs:label "Measure definition"@en, "Kennzahl"@de ;
+    rdfs:comment "One BAG column or an equivalent defined measure. Individuals are loaded from the codebook, not hand-listed in this ontology, except inside examples."@en .
+
+shi:StatisticObservation a owl:Class ;
+    rdfs:label "Statistic observation"@en ;
+    rdfs:comment "One number, one scope, one reference year. Establishment scope never points at a site."@en ;
+    owl:disjointWith shi:QualityObservation .
+
+shi:QualityIndicator a owl:Class ;
+    rdfs:label "Quality indicator"@en, "Qualitätsindikator"@de ;
+    rdfs:comment "A CH-IQI code. The code is the concept. German and French sentences are labels."@en .
+
+shi:QualityObservation a owl:Class ;
+    rdfs:label "Quality observation"@en ;
+    rdfs:comment "Observed rate, expected rate, SMR, and case count for one indicator, one institution or site, and one time window. Suppression is a state, not zero."@en .
+
+shi:Document a owl:Class ;
+    rdfs:label "Document"@en .
+
+shi:DocumentChunk a owl:Class ;
+    rdfs:label "Document chunk"@en .
+
+shi:Evidence a owl:Class ;
+    rdfs:label "Evidence"@en ;
+    rdfs:comment "A located passage or a structured cell. Model confidence is not evidence."@en .
+
+shi:Assertion a owl:Class ;
+    rdfs:label "Assertion"@en ;
+    rdfs:comment "A claim with a fact status and at least one evidence record. Inferred assertions name the assertions they were derived from."@en .
+
+shi:Event a owl:Class ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "A change with a date and evidence. A stock figure for 2024 is not an event."@en .
+
+shi:Source a owl:Class ;
+    rdfs:label "Source"@en .
+
+shi:TimeInterval a owl:Class ;
+    rdfs:label "Time interval"@en .
+
+shi:HospitalTypologyConcept a owl:Class ;
+    rdfs:label "Hospital typology"@en, "Spitaltyp"@de ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:comment "BFS hospital typology, version 5.3 (2022), as reproduced in the 2024 key-figure workbook."@en .
+
+shi:LegalFormConcept a owl:Class ;
+    rdfs:label "Legal form group"@en, "Rechtsform"@de ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:comment "The four published groups plus unknown. The detailed BFS legal-form code is not retained in the 2024 data column."@en .
+
+shi:ActivityType a owl:Class ;
+    rdfs:label "Activity type"@en, "Aktivitätstyp"@de ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:comment "A acute care, P psychiatry, R rehabilitation, B birth house. German labels come from the 2024 German description. French and Italian labels were not in the opened German PDF."@en .
+
+shi:EquipmentConcept a owl:Class ;
+    rdfs:label "Equipment code"@en ;
+    rdfs:subClassOf skos:Concept .
+
+# ---------------------------------------------------------------------------
+# Object properties
+# The stored direction is the one with the cardinality constraint.
+# Inverse properties are declared for vocabulary completeness. Loaders write
+# the stored direction only, because this graph is queried without a reasoner.
+# ---------------------------------------------------------------------------
+
+shi:siteOf a owl:ObjectProperty ;
+    rdfs:label "site of"@en ;
+    rdfs:domain shi:HospitalSite ;
+    rdfs:range shi:HospitalOrganization ;
+    rdfs:comment "Required. An organization may have many sites. A site has one parent in a given source record."@en ;
+    owl:inverseOf shi:hasSite .
+
+shi:hasSite a owl:ObjectProperty ;
+    rdfs:label "has site"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:HospitalSite .
+
+shi:homeCanton a owl:ObjectProperty ;
+    rdfs:label "home canton"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:Canton ;
+    rdfs:comment "BAG column KT. Canton of administrative responsibility, not the canton of every site."@en .
+
+shi:siteCanton a owl:ObjectProperty ;
+    rdfs:label "site canton"@en ;
+    rdfs:domain shi:HospitalSite ;
+    rdfs:range shi:Canton ;
+    rdfs:comment "BAG column KT_Standort. May differ from the parent home canton."@en .
+
+shi:typology a owl:ObjectProperty ;
+    rdfs:label "typology"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:HospitalTypologyConcept .
+
+shi:legalForm a owl:ObjectProperty ;
+    rdfs:label "legal form"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:LegalFormConcept .
+
+shi:asserts a owl:ObjectProperty ;
+    rdfs:label "asserts"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:Assertion ;
+    rdfs:comment "A claim taken from a document and recorded for this organization. The assertion carries the fact status, so a candidate clinic is in the graph and is still a candidate."@en .
+
+shi:hasDepartment a owl:ObjectProperty ;
+    rdfs:label "has department"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:Department ;
+    rdfs:comment "Use shi:departmentAtSite when the source names the site. Do not invent a department from a typology or an SA token."@en .
+
+shi:departmentAtSite a owl:ObjectProperty ;
+    rdfs:label "department at site"@en ;
+    rdfs:domain shi:Department ;
+    rdfs:range shi:HospitalSite .
+
+shi:hasClinic a owl:ObjectProperty ;
+    rdfs:label "has clinic"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:Clinic .
+
+shi:hasSpecialty a owl:ObjectProperty ;
+    rdfs:label "has specialty"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:Specialty .
+
+shi:worksAt a owl:ObjectProperty ;
+    rdfs:label "works at"@en ;
+    rdfs:domain shi:HealthcareProfessional ;
+    rdfs:range shi:HospitalOrganization ;
+    rdfs:comment "Requires evidence and a date. Not inferred from a publication affiliation."@en .
+
+shi:worksAtSite a owl:ObjectProperty ;
+    rdfs:label "works at site"@en ;
+    rdfs:domain shi:HealthcareProfessional ;
+    rdfs:range shi:HospitalSite .
+
+shi:leads a owl:ObjectProperty ;
+    rdfs:label "leads"@en ;
+    rdfs:domain shi:HealthcareProfessional ;
+    rdfs:range shi:Department .
+
+shi:providesService a owl:ObjectProperty ;
+    rdfs:label "provides service"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:MedicalService .
+
+shi:offersTreatment a owl:ObjectProperty ;
+    rdfs:label "offers treatment"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:Treatment .
+
+shi:treatsCondition a owl:ObjectProperty ;
+    rdfs:label "treats condition"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:MedicalCondition .
+
+shi:usesDevice a owl:ObjectProperty ;
+    rdfs:label "uses device"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:MedicalDevice ;
+    rdfs:comment "Only for a described device. Equipment presence uses shi:recordedFor and shi:presenceOf."@en .
+
+shi:recordedFor a owl:ObjectProperty ;
+    rdfs:label "recorded for"@en ;
+    rdfs:domain shi:CodedPresence ;
+    rdfs:range shi:HospitalOrganization .
+
+shi:presenceOf a owl:ObjectProperty ;
+    rdfs:label "presence of"@en ;
+    rdfs:domain shi:EquipmentPresence ;
+    rdfs:range shi:EquipmentConcept .
+
+shi:participatesIn a owl:ObjectProperty ;
+    rdfs:label "participates in"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:ResearchProject .
+
+shi:authored a owl:ObjectProperty ;
+    rdfs:label "authored"@en ;
+    rdfs:domain shi:HealthcareProfessional ;
+    rdfs:range shi:Publication .
+
+shi:affiliatedWith a owl:ObjectProperty ;
+    rdfs:label "affiliated with"@en ;
+    rdfs:domain shi:Publication ;
+    rdfs:range shi:HospitalOrganization ;
+    rdfs:comment "Means the publication states the affiliation. It does not mean the author currently works there."@en .
+
+shi:cooperatesWith a owl:ObjectProperty ;
+    rdfs:label "cooperates with"@en ;
+    rdfs:domain shi:Cooperation ;
+    rdfs:range shi:HospitalOrganization ;
+    rdfs:comment "Attached to a Cooperation node so the relationship can carry evidence. A bare organization-to-organization edge is not used."@en .
+
+shi:hasCertification a owl:ObjectProperty ;
+    rdfs:label "has certification"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:Certification .
+
+shi:aboutOrganization a owl:ObjectProperty ;
+    rdfs:label "about organization"@en ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf ( shi:StatisticObservation shi:QualityObservation )
+    ] ;
+    rdfs:range shi:HospitalOrganization ;
+    rdfs:comment "Set when a statistic's statisticalScope is establishment, or when a quality row is matched to an organization. Forbidden when statisticalScope is national."@en .
+
+shi:aboutSite a owl:ObjectProperty ;
+    rdfs:label "about site"@en ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf ( shi:StatisticObservation shi:QualityObservation )
+    ] ;
+    rdfs:range shi:HospitalSite ;
+    rdfs:comment "Forbidden for measures in the 2024 key-figure workbook. Those measures are establishment-scoped."@en .
+
+shi:activityType a owl:ObjectProperty ;
+    rdfs:label "activity type"@en ;
+    rdfs:range shi:ActivityType .
+
+shi:measure a owl:ObjectProperty ;
+    rdfs:label "measure"@en ;
+    rdfs:domain shi:StatisticObservation ;
+    rdfs:range shi:MeasureDefinition .
+
+shi:indicator a owl:ObjectProperty ;
+    rdfs:label "indicator"@en ;
+    rdfs:domain shi:QualityObservation ;
+    rdfs:range shi:QualityIndicator .
+
+shi:supportedBy a owl:ObjectProperty ;
+    rdfs:label "supported by"@en ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf (
+            shi:HospitalOrganization
+            shi:HospitalSite
+            shi:Assertion
+            shi:StatisticObservation
+            shi:QualityObservation
+            shi:CodedPresence
+            shi:Event
+        )
+    ] ;
+    rdfs:range shi:Evidence .
+
+shi:derivedFrom a owl:ObjectProperty ;
+    rdfs:label "derived from"@en ;
+    rdfs:domain shi:Assertion ;
+    rdfs:range shi:Assertion ;
+    rdfs:comment "Required when assertionMode is inferred. The derived claim is not presented as a documented fact."@en .
+
+shi:mentionedIn a owl:ObjectProperty ;
+    rdfs:label "mentioned in"@en ;
+    rdfs:range shi:Document .
+
+shi:validDuring a owl:ObjectProperty ;
+    rdfs:label "valid during"@en ;
+    rdfs:domain shi:Assertion ;
+    rdfs:range shi:TimeInterval .
+
+shi:succeededBy a owl:ObjectProperty ;
+    rdfs:label "succeeded by"@en ;
+    rdfs:domain shi:Assertion ;
+    rdfs:range shi:Assertion ;
+    rdfs:comment "Not implied by a later reference year. The 2024 methodology break blocks automatic supersession of 2023."@en .
+
+shi:refersTo a owl:ObjectProperty ;
+    rdfs:label "refers to"@en ;
+    rdfs:domain shi:HospitalOrganization ;
+    rdfs:range shi:HospitalOrganization ;
+    rdfs:comment "Not used in version 0.1. A referral is a Cooperation or an Assertion with evidence."@en .
+
+shi:chunkOf a owl:ObjectProperty ;
+    rdfs:label "chunk of"@en ;
+    rdfs:domain shi:DocumentChunk ;
+    rdfs:range shi:Document .
+
+shi:evidenceIn a owl:ObjectProperty ;
+    rdfs:label "evidence in"@en ;
+    rdfs:domain shi:Evidence ;
+    rdfs:range shi:Document .
+
+# ---------------------------------------------------------------------------
+# Data properties
+# ---------------------------------------------------------------------------
+
+shi:officialName a owl:DatatypeProperty ;
+    rdfs:label "official name"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The name as published. Not normalized into another language."@en .
+
+shi:cantonCode a owl:DatatypeProperty ;
+    rdfs:label "canton code"@en ;
+    rdfs:domain shi:Canton ;
+    rdfs:range xsd:string .
+
+shi:postalStreet a owl:DatatypeProperty ;
+    rdfs:label "postal street"@en ;
+    rdfs:range xsd:string .
+
+shi:postalPlace a owl:DatatypeProperty ;
+    rdfs:label "postal place"@en ;
+    rdfs:range xsd:string .
+
+shi:referenceYear a owl:DatatypeProperty ;
+    rdfs:label "reference year"@en ;
+    rdfs:range xsd:gYear .
+
+shi:statisticalScope a owl:DatatypeProperty ;
+    rdfs:label "statistical scope"@en ;
+    rdfs:domain shi:StatisticObservation ;
+    rdfs:range xsd:string ;
+    rdfs:comment "establishment, site, or national."@en .
+
+shi:valueNumeric a owl:DatatypeProperty ;
+    rdfs:label "numeric value"@en ;
+    rdfs:range xsd:decimal .
+
+shi:rawValue a owl:DatatypeProperty ;
+    rdfs:label "raw value"@en ;
+    rdfs:range xsd:string .
+
+shi:valueState a owl:DatatypeProperty ;
+    rdfs:label "value state"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "value, not_available_in_source, not_published, not_applicable, unknown, suppressed, dash, or heading."@en .
+
+shi:unit a owl:DatatypeProperty ;
+    rdfs:label "unit"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "bed_operating_average, case, fte, hour, percent, per_device, count, or undeclared."@en .
+
+shi:factStatus a owl:DatatypeProperty ;
+    rdfs:label "fact status"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "candidate, accepted, verified, rejected, superseded, conflicting, or unknown. accepted means the hospital index and a parent mandate use the same name. verified plus official_structured_parse means the cell was copied, not that the method was re-audited."@en .
+
+shi:assertionMode a owl:DatatypeProperty ;
+    rdfs:label "assertion mode"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "documented, extracted, reviewed, or inferred. extracted is a sentence or menu label. reviewed is an accepted corroboration. inferred requires derivedFrom."@en .
+
+shi:extractionMethod a owl:DatatypeProperty ;
+    rdfs:label "extraction method"@en ;
+    rdfs:range xsd:string .
+
+shi:matchStatus a owl:DatatypeProperty ;
+    rdfs:label "match status"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "exact, probable, manual_review, or unmatched."@en .
+
+shi:sourceVariable a owl:DatatypeProperty ;
+    rdfs:label "source variable"@en ;
+    rdfs:range xsd:string .
+
+shi:codeSet a owl:DatatypeProperty ;
+    rdfs:label "code set"@en ;
+    rdfs:domain shi:CodedPresence ;
+    rdfs:range xsd:string ;
+    rdfs:comment "specific_service, training, equipment, or service_offer."@en .
+
+shi:excerpt a owl:DatatypeProperty ;
+    rdfs:label "excerpt"@en ;
+    rdfs:domain shi:Evidence ;
+    rdfs:range xsd:string .
+
+shi:sourceSheet a owl:DatatypeProperty ;
+    rdfs:label "source sheet"@en ;
+    rdfs:range xsd:string .
+
+shi:sourceFileName a owl:DatatypeProperty ;
+    rdfs:label "source file name"@en ;
+    rdfs:range xsd:string .
+
+shi:publicationStatus a owl:DatatypeProperty ;
+    rdfs:label "publication status"@en ;
+    rdfs:domain shi:MeasureDefinition ;
+    rdfs:range xsd:string .
+
+shi:measureCode a owl:DatatypeProperty ;
+    rdfs:label "measure code"@en ;
+    rdfs:domain shi:MeasureDefinition ;
+    rdfs:range xsd:string .
+
+shi:documentedIn a owl:DatatypeProperty ;
+    rdfs:label "documented in"@en ;
+    rdfs:range xsd:string .
+
+# ---------------------------------------------------------------------------
+# Concept schemes copied from the opened 2024 workbook and German description
+# ---------------------------------------------------------------------------
+
+shic:bfs-hospital-typology-5.3 a skos:ConceptScheme ;
+    rdfs:label "BFS hospital typology 5.3 (2022)"@en ;
+    shi:documentedIn "kzp24_data.xlsx sheet Typologie" .
+
+shic:typology-K111 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K111" ;
+    skos:prefLabel "Allgemeinspital, Zentrumsversorgung (Niveau 1, Universitätsspital)"@de, "Hôpital de soins généraux, prise en charge centralisée (niveau 1, hôpital universitaire)"@fr, "Ospedali per cure generali, presa a carico centralizzata (livello 1, ospedale universitario)"@it .
+
+shic:typology-K112 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K112" ;
+    skos:prefLabel "Allgemeinspital, Zentrumsversorgung (Niveau 2)"@de, "Hôpital de soins généraux, prise en charge centralisée (niveau 2)"@fr, "Ospedali per cure generali, presa a carico centralizzata (livello 2)"@it .
+
+shic:typology-K121 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K121" ;
+    skos:prefLabel "Allgemeinspital, Grundversorgung (Niveau 3)"@de, "Hôpital de soins généraux, soins de base (niveau 3)"@fr, "Ospedali per cure generali, cure di base (livello 3)"@it .
+
+shic:typology-K122 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K122" ;
+    skos:prefLabel "Allgemeinspital, Grundversorgung (Niveau 4)"@de, "Hôpital de soins généraux, soins de base (niveau 4)"@fr, "Ospedali per cure generali, cure di base (livello 4)"@it .
+
+shic:typology-K123 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K123" ;
+    skos:prefLabel "Allgemeinspital, Grundversorgung (Niveau 5)"@de, "Hôpital de soins généraux, soins de base (niveau 5)"@fr, "Ospedali per cure generali, cure di base (livello 5)"@it .
+
+shic:typology-K211 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K211" ;
+    skos:prefLabel "Psychiatrische Klinik (Niveau 1)"@de, "Clinique psychiatrique (niveau 1)"@fr, "Cliniche psichiatriche (livello 1)"@it .
+
+shic:typology-K212 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K212" ;
+    skos:prefLabel "Psychiatrische Klinik (Niveau 2)"@de, "Clinique psychiatrique (niveau 2)"@fr, "Cliniche psichiatriche (livello 2)"@it .
+
+shic:typology-K221 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K221" ;
+    skos:prefLabel "Rehabilitationsklinik"@de, "Clinique de réadaptation"@fr, "Cliniche di riabilitazione"@it .
+
+shic:typology-K231 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K231" ;
+    skos:prefLabel "Spezialklinik: Chirurgie"@de, "Clinique spécialisée : Chirurgie"@fr, "Cliniche specializzate: chirurgia"@it .
+
+shic:typology-K232 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K232" ;
+    skos:prefLabel "Spezialklinik: Gynäkologie / Neonatologie"@de, "Clinique spécialisée : Gynécologie/néonatologie"@fr, "Cliniche specializzate: ginecologia/neonatologia"@it .
+
+shic:typology-K233 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K233" ;
+    skos:prefLabel "Spezialklinik: Pädiatrie"@de, "Clinique spécialisée : Pédiatrie"@fr, "Cliniche specializzate: pediatria"@it .
+
+shic:typology-K234 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K234" ;
+    skos:prefLabel "Spezialklinik: Geriatrie"@de, "Clinique spécialisée : Gériatrie"@fr, "Cliniche specializzate: geriatria"@it .
+
+shic:typology-K235 a shi:HospitalTypologyConcept, skos:Concept ;
+    skos:inScheme shic:bfs-hospital-typology-5.3 ;
+    skos:notation "K235" ;
+    skos:prefLabel "Spezialklinik: Diverse"@de, "Clinique spécialisée : Divers"@fr, "Cliniche specializzate: altre"@it .
+
+shic:legal-form-groups a skos:ConceptScheme ;
+    rdfs:label "BAG legal-form groups"@en ;
+    shi:documentedIn "kzp24_data.xlsx sheet Rechtsform" .
+
+shic:legalform-R1 a shi:LegalFormConcept, skos:Concept ;
+    skos:inScheme shic:legal-form-groups ;
+    skos:notation "R1" ;
+    skos:prefLabel "AG / GmbH"@de, "SA / Sàrl"@fr, "SA / Sagl"@it .
+
+shic:legalform-R2 a shi:LegalFormConcept, skos:Concept ;
+    skos:inScheme shic:legal-form-groups ;
+    skos:notation "R2" ;
+    skos:prefLabel "Verein / Stiftung"@de, "Association / fondation"@fr, "Associazione / fondazione"@it .
+
+shic:legalform-R3 a shi:LegalFormConcept, skos:Concept ;
+    skos:inScheme shic:legal-form-groups ;
+    skos:notation "R3" ;
+    skos:prefLabel "Einzelfirma / Gesellschaft"@de, "Raison individuelle / société"@fr, "Ditta individuale / società"@it .
+
+shic:legalform-R4 a shi:LegalFormConcept, skos:Concept ;
+    skos:inScheme shic:legal-form-groups ;
+    skos:notation "R4" ;
+    skos:prefLabel "Öffentliches Unternehmen"@de, "Entreprise publique"@fr, "Impresa pubblica"@it .
+
+shic:legalform-R0 a shi:LegalFormConcept, skos:Concept ;
+    skos:inScheme shic:legal-form-groups ;
+    skos:notation "R0" ;
+    skos:prefLabel "Unbekannt"@de, "Inconnu"@fr, "Sconosciuto"@it .
+
+shic:activity-types a skos:ConceptScheme ;
+    rdfs:label "Activity types in the 2024 key figures"@en ;
+    shi:documentedIn "kzp24_description_de.pdf, Angaben pro Aktivitätstyp" .
+
+shic:activity-A a shi:ActivityType, skos:Concept ;
+    skos:inScheme shic:activity-types ;
+    skos:notation "A" ;
+    skos:prefLabel "Akutbehandlung"@de ;
+    shi:sourceVariable "KS A.01.01" .
+
+shic:activity-P a shi:ActivityType, skos:Concept ;
+    skos:inScheme shic:activity-types ;
+    skos:notation "P" ;
+    skos:prefLabel "Psychiatrie"@de ;
+    shi:sourceVariable "KS A.01.02" .
+
+shic:activity-R a shi:ActivityType, skos:Concept ;
+    skos:inScheme shic:activity-types ;
+    skos:notation "R" ;
+    skos:prefLabel "Rehabilitation"@de ;
+    shi:sourceVariable "KS A.01.03" .
+
+shic:activity-B a shi:ActivityType, skos:Concept ;
+    skos:inScheme shic:activity-types ;
+    skos:notation "B" ;
+    skos:prefLabel "Geburtshaus"@de ;
+    rdfs:comment "Split out of acute care for the publication with auxiliary variable AKTIVITAET = 1001. Not a separate SpiGes activity."@en ;
+    shi:sourceVariable "KS A.01.01 and AKTIVITAET=1001" .
+
+shic:equipment-codes a skos:ConceptScheme ;
+    rdfs:label "Special equipment tokens defined in the 2024 German description"@en ;
+    shi:documentedIn "kzp24_description_de.pdf, Spezialausrüstung" .
+
+shic:equipment-MRI a shi:EquipmentConcept, skos:Concept ;
+    skos:inScheme shic:equipment-codes ;
+    skos:notation "MRI" ;
+    skos:prefLabel "Magnetresonanztomograph"@de ;
+    shi:sourceVariable "KS A.13.001" .
+
+shic:equipment-CT a shi:EquipmentConcept, skos:Concept ;
+    skos:inScheme shic:equipment-codes ;
+    skos:notation "CT" ;
+    skos:prefLabel "Computertomograph"@de ;
+    shi:sourceVariable "KS A.13.002" .
+
+shic:equipment-PET a shi:EquipmentConcept, skos:Concept ;
+    skos:inScheme shic:equipment-codes ;
+    skos:notation "PET" ;
+    skos:prefLabel "Positronen-Emissions-Tomograph"@de ;
+    shi:sourceVariable "KS A.13.003" .
+
+shic:equipment-CC a shi:EquipmentConcept, skos:Concept ;
+    skos:inScheme shic:equipment-codes ;
+    skos:notation "CC" ;
+    skos:prefLabel "Gammakamera inkl. Szintigraphie und SPECT-Scanner"@de ;
+    shi:sourceVariable "KS A.13.004" .
+
+shic:equipment-LB a shi:EquipmentConcept, skos:Concept ;
+    skos:inScheme shic:equipment-codes ;
+    skos:notation "LB" ;
+    skos:prefLabel "Linearbeschleuniger"@de ;
+    shi:sourceVariable "KS A.13.005" .
+
+shic:equipment-Lito a shi:EquipmentConcept, skos:Concept ;
+    skos:inScheme shic:equipment-codes ;
+    skos:notation "Lito" ;
+    skos:prefLabel "Lithotriptor"@de ;
+    rdfs:comment "The description writes LITO. The data column uses Lito."@en ;
+    shi:sourceVariable "KS A.13.006" .

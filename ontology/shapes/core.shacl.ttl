@@ -1,0 +1,207 @@
+# SHACL shapes for ontology 0.1.
+# pySHACL runs these shapes. scripts/check_ontology_example.py repeats the
+# same rules as SPARQL on the KSGR example.
+# Each closed list contains a plain literal and an xsd:string. The example
+# uses plain literals. The projection writes xsd:string. pySHACL compares
+# those two forms as different terms.
+
+@prefix shi: <https://example.org/shi/ontology/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+shi:HospitalOrganizationShape a sh:NodeShape ;
+    sh:targetClass shi:HospitalOrganization ;
+    sh:property [
+        sh:path shi:homeCanton ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class shi:Canton ;
+    ] ;
+    sh:property [
+        sh:path shi:officialName ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path shi:referenceYear ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:gYear ;
+    ] .
+
+shi:HospitalSiteShape a sh:NodeShape ;
+    sh:targetClass shi:HospitalSite ;
+    sh:property [
+        sh:path shi:siteOf ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class shi:HospitalOrganization ;
+    ] ;
+    sh:property [
+        sh:path shi:siteCanton ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class shi:Canton ;
+    ] ;
+    sh:property [
+        sh:path shi:officialName ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+    ] .
+
+shi:EstablishmentStatisticShape a sh:NodeShape ;
+    sh:targetClass shi:StatisticObservation ;
+    sh:sparql [
+        sh:message "An establishment-scoped statistic must name one organization and must not name a site."@en ;
+        sh:select """
+            PREFIX shi: <https://example.org/shi/ontology/>
+            SELECT $this WHERE {
+                $this shi:statisticalScope ?scope .
+                FILTER (STR(?scope) = \"establishment\")
+                {
+                    FILTER NOT EXISTS { $this shi:aboutOrganization ?org }
+                }
+                UNION
+                {
+                    $this shi:aboutSite ?site
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "A national statistic must not name an organization or a site."@en ;
+        sh:select """
+            PREFIX shi: <https://example.org/shi/ontology/>
+            SELECT $this WHERE {
+                $this shi:statisticalScope ?scope .
+                FILTER (STR(?scope) = \"national\")
+                { $this shi:aboutOrganization ?org }
+                UNION
+                { $this shi:aboutSite ?site }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "valueState 'value' requires valueNumeric."@en ;
+        sh:select """
+            PREFIX shi: <https://example.org/shi/ontology/>
+            SELECT $this WHERE {
+                $this shi:valueState ?state .
+                FILTER (STR(?state) = \"value\")
+                FILTER NOT EXISTS { $this shi:valueNumeric ?n }
+            }
+        """ ;
+    ] ;
+    sh:property [
+        sh:path shi:statisticalScope ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in (
+            "establishment" "establishment"^^xsd:string
+            "site" "site"^^xsd:string
+            "national" "national"^^xsd:string
+        ) ;
+    ] ;
+    sh:property [
+        sh:path shi:valueState ;
+        sh:minCount 1 ;
+        sh:in (
+            "value" "value"^^xsd:string
+            "not_available_in_source" "not_available_in_source"^^xsd:string
+            "not_published" "not_published"^^xsd:string
+            "not_applicable" "not_applicable"^^xsd:string
+            "unknown" "unknown"^^xsd:string
+            "suppressed" "suppressed"^^xsd:string
+            "dash" "dash"^^xsd:string
+            "heading" "heading"^^xsd:string
+        ) ;
+    ] ;
+    sh:property [
+        sh:path shi:supportedBy ;
+        sh:minCount 1 ;
+        sh:class shi:Evidence ;
+    ] .
+
+shi:EquipmentPresenceShape a sh:NodeShape ;
+    sh:targetClass shi:EquipmentPresence ;
+    sh:property [
+        sh:path shi:recordedFor ;
+        sh:minCount 1 ;
+        sh:class shi:HospitalOrganization ;
+    ] ;
+    sh:property [
+        sh:path shi:presenceOf ;
+        sh:minCount 1 ;
+        sh:class shi:EquipmentConcept ;
+    ] ;
+    sh:sparql [
+        sh:message "Equipment presence must not also be typed as a medical device."@en ;
+        sh:select """
+            PREFIX shi: <https://example.org/shi/ontology/>
+            SELECT $this WHERE {
+                $this a shi:MedicalDevice .
+            }
+        """ ;
+    ] .
+
+shi:AssertionShape a sh:NodeShape ;
+    sh:targetClass shi:Assertion ;
+    sh:property [
+        sh:path shi:factStatus ;
+        sh:minCount 1 ;
+        sh:in (
+            "candidate" "candidate"^^xsd:string
+            "accepted" "accepted"^^xsd:string
+            "verified" "verified"^^xsd:string
+            "rejected" "rejected"^^xsd:string
+            "superseded" "superseded"^^xsd:string
+            "conflicting" "conflicting"^^xsd:string
+            "unknown" "unknown"^^xsd:string
+        ) ;
+    ] ;
+    sh:property [
+        sh:path shi:assertionMode ;
+        sh:minCount 1 ;
+        sh:in (
+            "documented" "documented"^^xsd:string
+            "extracted" "extracted"^^xsd:string
+            "reviewed" "reviewed"^^xsd:string
+            "inferred" "inferred"^^xsd:string
+        ) ;
+    ] ;
+    sh:property [
+        sh:path shi:supportedBy ;
+        sh:minCount 1 ;
+        sh:class shi:Evidence ;
+    ] ;
+    sh:sparql [
+        sh:message "An inferred assertion must name at least one source assertion."@en ;
+        sh:select """
+            PREFIX shi: <https://example.org/shi/ontology/>
+            SELECT $this WHERE {
+                $this shi:assertionMode ?mode .
+                FILTER (STR(?mode) = \"inferred\")
+                FILTER NOT EXISTS { $this shi:derivedFrom ?earlier }
+            }
+        """ ;
+    ] .
+
+# The partner is officialName until a second organization is resolved.
+# The shape does not invent that organization.
+shi:CooperationShape a sh:NodeShape ;
+    sh:targetClass shi:Cooperation ;
+    sh:property [
+        sh:path shi:officialName ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path shi:cooperatesWith ;
+        sh:minCount 1 ;
+        sh:class shi:HospitalOrganization ;
+    ] ;
+    sh:property [
+        sh:path shi:supportedBy ;
+        sh:minCount 1 ;
+        sh:class shi:Evidence ;
+    ] .

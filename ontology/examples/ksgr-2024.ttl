@@ -1,0 +1,137 @@
+# Fragment of Kantonsspital Graubünden as published in BAG key figures 2024.
+# Not a complete row. Numbers are copied from kzp24_data.xlsx sheet KZ2024_KZP24
+# and sites from sheet Standorte_KZ2024_KZP24.
+# The 343 acute operating beds are attached to the organization only.
+
+@prefix shi: <https://example.org/shi/ontology/> .
+@prefix shic: <https://example.org/shi/concept/> .
+@prefix shid: <https://example.org/shi/data/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+shid:canton-GR a shi:Canton ;
+    shi:cantonCode "GR" .
+
+shid:canton-SG a shi:Canton ;
+    shi:cantonCode "SG" .
+
+shid:source-bag-kzp-2024 a shi:Source ;
+    shi:officialName "Kennzahlen der Schweizer Spitäler 2024" ;
+    shi:sourceFileName "kzp24_data.xlsx" .
+
+shid:evidence-ksgr-establishment a shi:Evidence ;
+    shi:evidenceIn shid:source-bag-kzp-2024 ;
+    shi:sourceFileName "kzp24_data.xlsx" ;
+    shi:sourceSheet "KZ2024_KZP24" ;
+    shi:excerpt "KT=GR; Inst=Kantonsspital Graubünden; Typ=K112; RForm=R2; Akt=A; AnzStand=2; BettenStatA=343; AustritteA=22153; PersA=480.84; SA contains MRI" ;
+    shi:extractionMethod "official_structured_parse" .
+
+shid:evidence-ksgr-sites a shi:Evidence ;
+    shi:evidenceIn shid:source-bag-kzp-2024 ;
+    shi:sourceFileName "kzp24_data.xlsx" ;
+    shi:sourceSheet "Standorte_KZ2024_KZP24" ;
+    shi:excerpt "Sites: Kantonsspital Graubünden, Loestrasse 170, 7000 Chur, KT_Standort=GR; Spital Walenstadt, Spitalstrasse 5, 8880 Walenstadt, KT_Standort=SG" ;
+    shi:extractionMethod "official_structured_parse" .
+
+shid:org-ksgr-2024 a shi:HospitalOrganization ;
+    shi:officialName "Kantonsspital Graubünden" ;
+    shi:homeCanton shid:canton-GR ;
+    shi:typology shic:typology-K112 ;
+    shi:legalForm shic:legalform-R2 ;
+    shi:activityType shic:activity-A ;
+    shi:postalStreet "Loestrasse 170" ;
+    shi:postalPlace "7000 Chur" ;
+    shi:referenceYear "2024"^^xsd:gYear ;
+    shi:factStatus "verified" ;
+    shi:matchStatus "exact" ;
+    shi:extractionMethod "official_structured_parse" ;
+    shi:supportedBy shid:evidence-ksgr-establishment .
+
+shid:site-ksgr-chur a shi:HospitalSite ;
+    shi:siteOf shid:org-ksgr-2024 ;
+    shi:officialName "Kantonsspital Graubünden" ;
+    shi:siteCanton shid:canton-GR ;
+    shi:postalStreet "Loestrasse 170" ;
+    shi:postalPlace "7000 Chur" ;
+    shi:referenceYear "2024"^^xsd:gYear ;
+    shi:factStatus "verified" ;
+    shi:supportedBy shid:evidence-ksgr-sites .
+
+shid:site-ksgr-walenstadt a shi:HospitalSite ;
+    shi:siteOf shid:org-ksgr-2024 ;
+    shi:officialName "Spital Walenstadt" ;
+    shi:siteCanton shid:canton-SG ;
+    shi:postalStreet "Spitalstrasse 5" ;
+    shi:postalPlace "8880 Walenstadt" ;
+    shi:referenceYear "2024"^^xsd:gYear ;
+    shi:factStatus "verified" ;
+    shi:supportedBy shid:evidence-ksgr-sites .
+
+shid:measure-BettenStatA a shi:MeasureDefinition ;
+    shi:measureCode "BettenStatA" ;
+    shi:unit "bed_operating_average" ;
+    shi:statisticalScope "establishment" ;
+    shi:publicationStatus "published" ;
+    shi:activityType shic:activity-A .
+
+shid:measure-AustritteA a shi:MeasureDefinition ;
+    shi:measureCode "AustritteA" ;
+    shi:unit "case" ;
+    shi:statisticalScope "establishment" ;
+    shi:publicationStatus "published" ;
+    shi:activityType shic:activity-A .
+
+shid:measure-PersA a shi:MeasureDefinition ;
+    shi:measureCode "PersA" ;
+    shi:unit "fte" ;
+    shi:statisticalScope "establishment" ;
+    shi:publicationStatus "published" .
+
+shid:stat-ksgr-beds-a a shi:StatisticObservation ;
+    shi:aboutOrganization shid:org-ksgr-2024 ;
+    shi:measure shid:measure-BettenStatA ;
+    shi:activityType shic:activity-A ;
+    shi:statisticalScope "establishment" ;
+    shi:referenceYear "2024"^^xsd:gYear ;
+    shi:valueNumeric 343 ;
+    shi:rawValue "343" ;
+    shi:valueState "value" ;
+    shi:unit "bed_operating_average" ;
+    shi:factStatus "verified" ;
+    shi:extractionMethod "official_structured_parse" ;
+    shi:supportedBy shid:evidence-ksgr-establishment .
+
+shid:stat-ksgr-discharges-a a shi:StatisticObservation ;
+    shi:aboutOrganization shid:org-ksgr-2024 ;
+    shi:measure shid:measure-AustritteA ;
+    shi:activityType shic:activity-A ;
+    shi:statisticalScope "establishment" ;
+    shi:referenceYear "2024"^^xsd:gYear ;
+    shi:valueNumeric 22153 ;
+    shi:rawValue "22153" ;
+    shi:valueState "value" ;
+    shi:unit "case" ;
+    shi:factStatus "verified" ;
+    shi:extractionMethod "official_structured_parse" ;
+    shi:supportedBy shid:evidence-ksgr-establishment .
+
+shid:stat-ksgr-physicians a shi:StatisticObservation ;
+    shi:aboutOrganization shid:org-ksgr-2024 ;
+    shi:measure shid:measure-PersA ;
+    shi:statisticalScope "establishment" ;
+    shi:referenceYear "2024"^^xsd:gYear ;
+    shi:valueNumeric 480.84 ;
+    shi:rawValue "480.84" ;
+    shi:valueState "value" ;
+    shi:unit "fte" ;
+    shi:factStatus "verified" ;
+    shi:extractionMethod "official_structured_parse" ;
+    shi:supportedBy shid:evidence-ksgr-establishment .
+
+shid:equip-ksgr-mri a shi:EquipmentPresence ;
+    shi:recordedFor shid:org-ksgr-2024 ;
+    shi:presenceOf shic:equipment-MRI ;
+    shi:codeSet "equipment" ;
+    shi:referenceYear "2024"^^xsd:gYear ;
+    shi:factStatus "verified" ;
+    shi:extractionMethod "official_structured_parse" ;
+    shi:supportedBy shid:evidence-ksgr-establishment .
